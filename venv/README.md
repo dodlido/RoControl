@@ -5,8 +5,8 @@ A python library to generate FSM graphs and Verilog code
 
 ## PLACEHOLDER 1
 
-Some words here
+Some words here.
 
 ## PLACEHOLDER 2
 
-Other words here
+Other words here.
