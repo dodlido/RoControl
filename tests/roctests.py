@@ -1,4 +1,4 @@
-from rocontrol_lib.roclass import * 
+from rocontrol.roclass import * 
 
 vld = input('vld', 1)
 clr = input('clr', 1)
