@@ -1,0 +1,20 @@
+digraph FSM {
+	IDLE
+	S1
+	S2
+	S3
+	IDLE -> S1 [label="vld & !clr
+(count = 1 )"]
+	S1 -> S2 [label="vld & !clr
+(count = 2 )"]
+	S2 -> S3 [label="vld & !clr
+(count = 3 )"]
+	S3 -> S1 [label="vld & !clr
+(count = 1 )"]
+	S1 -> IDLE [label="clr
+(count = 0 )"]
+	S2 -> IDLE [label="clr
+(count = 0 )"]
+	S3 -> IDLE [label="clr
+(count = 0 )"]
+}
