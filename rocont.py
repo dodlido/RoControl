@@ -21,7 +21,11 @@ def flag_parser():
     return args.out_folder, args.graph, args.verilog
 
 def main():
-    out_folder, graph, verilog = flag_parser()
+    debug = False
+    if not debug:
+        out_folder, graph, verilog = flag_parser()
+    else:
+        graph, debug, out_folder = True, True, 'out_debug'
     # Get FSM:
     fsm = get_fsm()
     if (graph):
