@@ -1,7 +1,7 @@
 import argparse
 import sys
-from rocontrol.roclass import * 
-from examples.counter import *
+from rocontrol.backend import * 
+from examples.examples import get_counter
 
 def flag_parser():
     # Instantiate the parser:
@@ -21,19 +21,15 @@ def flag_parser():
     return args.out_folder, args.graph, args.verilog
 
 def main():
-    debug = False
-    if not debug:
-        out_folder, graph, verilog = flag_parser()
-    else:
-        graph, debug, out_folder = True, True, 'out_debug'
+    out_folder, graph, verilog = flag_parser()
     # Get FSM:
-    fsm = get_fsm()
+    counter = get_counter()
     if (graph):
         # Generate graph:
-        fsm.build_graph(out_folder)
+        counter.build_graph(out_folder)
     if (verilog):
         # Generate verilog:
-        fsm.build_verilog(out_folder)
+        counter.build_verilog(out_folder)
 
 if __name__ == "__main__":
     main()
