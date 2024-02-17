@@ -4,7 +4,9 @@ import graphviz
 from datetime import datetime
 from boolean_parser.actions.boolean import BoolNot, BoolAnd, BoolOr
 from boolean_parser.actions.clause import Condition
-from math import log2, ceil
+from math import log2, ceil, pow
+import numpy as np
+import itertools
 
 # Classes:
 
@@ -29,7 +31,7 @@ class state:
 
 # Arch class:
 class arch:
-    def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
+    def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str, index=0) -> None:
         if isinstance(source, str):
             self.source = state(source, False)
         else:
@@ -38,6 +40,7 @@ class arch:
             self.dest = state(dest, False)
         else:
             self.dest = dest
+        self.index = index
         self.cond = parse(cond_str)
         self.out = parse(out_str)
 
@@ -76,13 +79,103 @@ def get_max_val(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], 
             return int(cond.value)
         else:
             return max
+    elif isinstance(cond, BoolNot):
+        return get_max_val(cond.conditions[0], name, max)
     else:
         lhs_max = get_max_val(cond.conditions[0], name, max)
         rhs_max = get_max_val(cond.conditions[1], name, max)
-    if lhs_max > rhs_max:
-        return lhs_max 
+        if lhs_max > rhs_max:
+            return lhs_max 
+        else:
+            return rhs_max
+
+def is_met_comp(param: int, op: str, val: int) -> bool:
+    if op=='=':
+        return param==val
+    elif op=='!=':
+        return param!=val
+    elif op=='>':
+        return param>val
+    elif op=='>=':
+        return param>=val
+    elif op=='<=':
+        return param<=val
+    elif op=='<':
+        return param<val
     else:
-        return rhs_max
+        print('logical_op %s not supported yet', op)
+        exit(2)
+
+def is_met_lop(b1: bool, lop: str, b2: bool) -> bool:
+    if lop=='or':
+        return b1 or b2
+    elif lop=='and':
+        return b1 and b2
+    elif lop=='not':
+        print('Not implemented yet') 
+    else:
+        print('logical_op %s not supported yet', lop)
+        exit(2)
+
+def check_cond(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]]|List[type[output]], values: List[int], truth: bool) -> bool:
+    if (isinstance(cond, Condition)):
+        for i, s in enumerate(sigs):
+            if s.name == cond.name:
+                bottom_truth = is_met_comp(values[i], cond.operator, int(cond.value))
+                return bottom_truth and truth
+    elif isinstance(cond, BoolNot):
+        return not check_cond(cond.conditions[0], sigs, values, truth)
+    else:
+        lhs_truth = check_cond(cond.conditions[0], sigs, values, truth)
+        rhs_truth = check_cond(cond.conditions[1], sigs, values, truth)
+        return is_met_lop(lhs_truth, cond.logicop, rhs_truth)
+        
+def comp_conds(cond1: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr],
+               cond2: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]], values: List[int]) -> bool:
+    if (isinstance(cond1, Condition) and isinstance(cond2, Condition)) or (not isinstance(cond1, Condition)) and (not isinstance(cond2, Condition)):
+        return check_cond(cond1, sigs, values, True)==check_cond(cond2, sigs, values, True)
+    else:
+        return False
+
+def get_permuatations(sigs: List[type[input]]) -> List:
+    biggest = 0
+    max_val_list = []
+    for sig in sigs:
+        curr_max = int(pow(2, sig.width))
+        max_val_list.append(curr_max-1)
+        if biggest < curr_max:
+            biggest = curr_max
+    full_list = list(map(list, itertools.product(range(biggest), repeat=len(sigs))))
+    better_list = []
+    for i in range(len(full_list)):
+        okay = True
+        for s in range(len(sigs)):
+            if full_list[i][s] > max_val_list[s]:
+                okay = False
+        if okay:
+            better_list.append(full_list[i])
+    return better_list
+
+def comp_conds_wrapper(cond1: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr],
+                       cond2: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]]) -> bool:
+    permutations = get_permuatations(sigs)
+    equal = True
+    for perm in permutations:
+        if not comp_conds(cond1, cond2, sigs, perm):
+            equal = False
+    return equal
+
+def unite_conds(arch_list: List[type[arch]], input_list: List[type[input]])->List[type[arch]]:
+    index = 1
+    for a1 in arch_list:
+        if a1.index == 0 :
+            a1.index = index
+            index += 1
+        for a2 in arch_list:
+            if a2.index==0:
+                if comp_conds_wrapper(a1.cond, a2.cond, input_list):
+                    a2.index = a1.index
+    return arch_list
 
 def cond_2_v(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]]|List[type[output]], code='') -> str:
     if (isinstance(cond, Condition)):
@@ -90,12 +183,14 @@ def cond_2_v(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sig
             if s.name == cond.name:
                 w = s.width
         return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:]
+    elif isinstance(cond, BoolNot):
+        return code + lop_2_v(cond.logicop) + cond_2_v(cond.conditions[0], sigs, code)
     else:
         lhs = '(' + cond_2_v(cond.conditions[0], sigs, code) + ')'
         rhs = '(' + cond_2_v(cond.conditions[1], sigs, code) + ')'
         return code + lhs + lop_2_v(cond.logicop) + rhs
     
-def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]]|List[type[output]], label='') -> str:
+def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]], label='') -> str:
     if (isinstance(cond, Condition)):
         for s in sigs:
             if s.name == cond.name:
@@ -107,10 +202,41 @@ def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sig
                 return label + '!' + cond.name
         else:        
             return label + cond.name + cond.operator + cond.value
+    elif isinstance(cond, BoolNot):
+        return label + lop_2_g(cond.logicop) + cond_2_g(cond.conditions[0], sigs, label)
     else:
         lhs = '(' + cond_2_g(cond.conditions[0], sigs, label) + ')'
         rhs = '(' + cond_2_g(cond.conditions[1], sigs, label) + ')'
         return label + lhs + lop_2_g(cond.logicop) + rhs
+
+def out_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[output]], out_list: List[int]) -> List[int]:
+    if (isinstance(cond, Condition)):
+        for i, s in enumerate(sigs):
+            if s.name==cond.name:
+                out_list[i] = cond.value
+        return out_list
+    else:
+        left_list = out_2_g(cond.conditions[0], sigs, out_list)
+        right_list = out_2_g(cond.conditions[1], sigs, out_list)
+        for i in range(len(out_list)):
+            if left_list[i] == -1:
+                out_list[i] = right_list[i]
+            else:
+                out_list[i] = left_list[i]
+        return out_list
+
+def out_2_g_wrapper(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[output]]) -> str:
+    out_list = []
+    for i in range(len(sigs)):
+        out_list.append(-1)
+    out_list = out_2_g(cond, sigs, out_list)
+    label = '{'
+    for o in out_list:
+        if o==-1:
+            label += 'x, '
+        else:
+            label += str(o) + ', '
+    return label[:-2] + '}'
 
 def get_fsm_states(arch_list: List[arch], ds_name=None) -> Tuple[state, List[state]]:
     states = []
@@ -123,7 +249,6 @@ def get_fsm_states(arch_list: List[arch], ds_name=None) -> Tuple[state, List[sta
         if arch_list[i].dest.name not in state_names:
             states.append(arch_list[i].dest)
             state_names.append(arch_list[i].dest.name)
-    
     if ds_name is None:
         states[0].reset=True
     else:
@@ -131,7 +256,6 @@ def get_fsm_states(arch_list: List[arch], ds_name=None) -> Tuple[state, List[sta
             states[state_names.index(ds_name)].reset=True
         else:
             states.append(state(ds_name, True))
-    
     for s in states:
         if s.reset:
             default_state = s
@@ -182,9 +306,9 @@ def get_fsm_interface(arch_list: List[arch], get_out=False) -> List[input]|List[
 class fsm:
     def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=None) -> None:
         self.graph     = graphviz.Digraph('FSM', filename='fsm.gv') # Create an empty directed graphviz graph
-        self.arch_list = arch_list
-        self.inputs    = get_fsm_interface(self.arch_list)
-        self.outputs   = get_fsm_interface(self.arch_list, get_out=True) 
+        self.inputs    = get_fsm_interface(arch_list)
+        self.outputs   = get_fsm_interface(arch_list, get_out=True) 
+        self.arch_list = unite_conds(arch_list, self.inputs)
         self.default_state, self.states = get_fsm_states(self.arch_list, default_state)
         if clock is None:
             self.clock     = input('clk', 1)
@@ -204,8 +328,18 @@ class fsm:
         for state in self.states:
             self.graph.node(state.name)
         # Add edges:
+        index_list, legend = [], 'Transitions:\n'
         for arch in self.arch_list:
-            self.graph.edge(arch.source.name, arch.dest.name, (cond_2_g(arch.cond, self.inputs) + '\n{' + cond_2_g(arch.out, self.outputs) + '}'))
+            # self.graph.edge(arch.source.name, arch.dest.name, (cond_2_g(arch.cond, self.inputs) + '\n{' + cond_2_g(arch.out, self.outputs) + '}'))
+            self.graph.edge(arch.source.name, arch.dest.name, (str(arch.index) + '\n' + out_2_g_wrapper(arch.out, self.outputs)))
+            if arch.index not in index_list:
+                index_list.append(arch.index)
+                legend += str(arch.index) + ' --> ' + cond_2_g(arch.cond, self.inputs) + '\n'
+        legend += '\nOutputs:\n{'
+        for o in self.outputs:
+            legend += o.name + ', '
+        legend = legend[:-2] + '}'
+        self.graph.node(legend, shape='box')
         # Render graph
         self.graph.render(path + '/ctrl.gv').replace('\\', '/')
 
@@ -308,4 +442,3 @@ class fsm:
         footer  = 'endmodule:ctrl\n\n'
         footer += '//| Enjoy! Esty                                  |//\n'
         return footer
-
