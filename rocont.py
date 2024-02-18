@@ -1,6 +1,5 @@
 import argparse
 import sys
-from rocontrol.backend import * 
 from examples.examples import get_counter
 
 def flag_parser():

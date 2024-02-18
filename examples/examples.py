@@ -1,4 +1,5 @@
-from rocontrol.backend import * 
+from rocon.base_classes import arch
+from rocon.fsm_class import fsm
 
 def get_counter():
     
