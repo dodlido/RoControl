@@ -132,10 +132,7 @@ def check_cond(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], s
         
 def comp_conds(cond1: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr],
                cond2: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]], values: List[int]) -> bool:
-    if (isinstance(cond1, Condition) and isinstance(cond2, Condition)) or (not isinstance(cond1, Condition)) and (not isinstance(cond2, Condition)):
-        return check_cond(cond1, sigs, values, True)==check_cond(cond2, sigs, values, True)
-    else:
-        return False
+    return check_cond(cond1, sigs, values, True)==check_cond(cond2, sigs, values, True)
 
 def get_permuatations(sigs: List[type[input]]) -> List:
     biggest = 0
@@ -189,7 +186,28 @@ def cond_2_v(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sig
         lhs = '(' + cond_2_v(cond.conditions[0], sigs, code) + ')'
         rhs = '(' + cond_2_v(cond.conditions[1], sigs, code) + ')'
         return code + lhs + lop_2_v(cond.logicop) + rhs
-    
+
+def out_2_v(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[output]], code='') -> str:
+    if (isinstance(cond, Condition)):
+        for s in sigs:
+            if s.name == cond.name:
+                w = s.width
+        return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:] + ';\n'
+    else:
+        lhs = out_2_v(cond.conditions[0], sigs, code)
+        rhs = out_2_v(cond.conditions[1], sigs, code)
+        return code + lhs + rhs
+
+def out_2_v_wrapper(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[output]]) -> str:
+    pre_code = out_2_v(cond, sigs, '')
+    post_code = ''
+    for c in pre_code:
+        if c=='\n':
+            post_code += c + '            '
+        else:
+            post_code += c
+    return post_code[:-12]
+
 def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]], label='') -> str:
     if (isinstance(cond, Condition)):
         for s in sigs:
@@ -231,9 +249,9 @@ def out_2_g_wrapper(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolO
         out_list.append(-1)
     out_list = out_2_g(cond, sigs, out_list)
     label = '{'
-    for o in out_list:
+    for i, o in enumerate(out_list):
         if o==-1:
-            label += 'x, '
+            label += str(sigs[i].default) + ', '
         else:
             label += str(o) + ', '
     return label[:-2] + '}'
@@ -431,7 +449,7 @@ class fsm:
             for a in self.arch_list: 
                 if a.source.name == s.name:
                     out_logic += '         if (next_state == ' + a.dest.name + ')\n'
-                    out_logic += '            ' + cond_2_v(a.out, self.outputs) + ';\n'
+                    out_logic += '            ' + out_2_v_wrapper(a.out, self.outputs)
             out_logic += '      ' + 'end\n'
         out_logic += '   endcase\n'
         out_logic += 'end\n'
