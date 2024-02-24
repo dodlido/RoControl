@@ -7,8 +7,8 @@
 from typing import List
 from boolean_parser.actions.boolean import BoolNot, BoolAnd, BoolOr
 from boolean_parser.actions.clause import Condition
-from rocon.str_manipulation import lop_2_g
-from rocon.base_classes import input, output
+from library.str_manipulation import lop_2_g
+from library.base_classes import input, output
 
 # Convert arch.cond to graph label
 def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sigs: List[type[input]], label='') -> str:

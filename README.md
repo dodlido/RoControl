@@ -102,7 +102,17 @@ def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=
 - 'clock' - optional, name of clock signal, if none is specified use 'clk'  
 - 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
 
-3. For advanced usage, one can access the following internal values of the 'fsm' class:  
+3. The 'fsm' class defines 2 functions:
+- Function to build a graph:
+```python
+fsm.build_graph(output_path) # Path to output folder
+```
+- Function to build a verilog module:
+```python
+fsm.build_verilog(output_path) # Path to output folder
+```
+
+4. For advanced usage, one can access the following internal values of the 'fsm' class:  
 - input_list - a List of 'input' base class instances, each containing:  
   - name - string, input signal name  
   - width - int, input signal width in bits  
@@ -114,4 +124,4 @@ def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=
   - name - string, state name  
   - default - bool, True if this state is a default state
 
-4. See examples/examples.py for examples
+5. See examples/examples.py for examples

@@ -7,11 +7,11 @@
 # imports:
 from typing import List, Tuple
 import graphviz
-from rocon.base_classes import input, output, state, arch
-from rocon.build_graph import cond_2_g, out_2_g_wrapper
-from rocon.build_verilog import get_verilog_header, get_verilog_footer, get_verilog_enum, get_verilog_interface, get_verilog_ns_logic, get_verilog_out_logic
-from rocon.inferring import get_fsm_interface, get_fsm_states
-from rocon.cond_compare import unite_conds
+from library.base_classes import input, output, state, arch
+from library.build_graph import cond_2_g, out_2_g_wrapper
+from library.build_verilog import get_verilog_header, get_verilog_footer, get_verilog_enum, get_verilog_interface, get_verilog_ns_logic, get_verilog_out_logic
+from library.inferring import get_fsm_interface, get_fsm_states
+from library.cond_compare import unite_conds
 
 # FSM class:
 class fsm:
