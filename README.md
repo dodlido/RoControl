@@ -92,8 +92,8 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
   - 'cond_str' is the condition which trigers the transition between source and dest, examples can be seen in the above feature description.  
   - 'out_str' describes the desired outputs for the transition, examples can be seen in the above feature description.  
 - 'default_state' - optional, name of default state, if none is specified use first source state in first arch_list in fsm  
-  - 'clock' - optional, name of clock signal, if none is specified use 'clk'  
-  - 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
+- 'clock' - optional, name of clock signal, if none is specified use 'clk'  
+- 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
 
 3. For advanced usage, one can access the following internal values of the 'fsm' class:  
 - input_list - a List of 'input' base class instances, each containing:  
