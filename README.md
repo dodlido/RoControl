@@ -79,25 +79,29 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 ## Usage
 
 1. To use the above features one needs to define an instance of the class 'fsm'.  
+
 2. The class constructor is shown here:  
 ```python
     def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=None) -> None:  
 ```
-   2.1 'arch_list' is a list of instances of a class named 'arch'. The 'arch' class constructor is shown here:  
+- 'arch_list' is a list of instances of a class named 'arch'. The 'arch' class constructor is shown here:  
 ```python
        def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
 ```
-      2.1.1. 'source' and 'dest' are the source and destination states of the arch. For basic usage stick with sending strings containg desired state name.  
-      2.1.2. 'cond_str' is the condition which trigers the transition between source and dest, examples can be seen in the above feature description.  
-      2.1.3. 'out_str' describes the desired outputs for the transition, examples can be seen in the above feature description.  
-   2.2 'default_state' - optional, name of default state, if none is specified use first source state in first arch_list in fsm  
-   2.3 'clock' - optional, name of clock signal, if none is specified use 'clk'  
-   2.4 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
+  - 'source' and 'dest' are the source and destination states of the arch. For basic usage stick with sending strings containg desired state name.  
+  - 'cond_str' is the condition which trigers the transition between source and dest, examples can be seen in the above feature description.  
+  - 'out_str' describes the desired outputs for the transition, examples can be seen in the above feature description.  
+- 'default_state' - optional, name of default state, if none is specified use first source state in first arch_list in fsm  
+  - 'clock' - optional, name of clock signal, if none is specified use 'clk'  
+  - 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
+
 3. For advanced usage, one can access the following internal values of the 'fsm' class:  
-   3.1 input_list - a List of 'input' base class instances, each containing:  
-       3.1.1 name - string, input signal name  
-       3.1.2 width - int, input signal width in bits  
-   3.2 input_list - a List of 'input' base class instances, each containing:  
-       3.2.1 name - string, output signal name  
-       3.2.2 width - int, output signal width in bits  
-       3.2.2 default - int, output signal default value  
+- input_list - a List of 'input' base class instances, each containing:  
+  - name - string, input signal name  
+  - width - int, input signal width in bits  
+- input_list - a List of 'input' base class instances, each containing:  
+  - name - string, output signal name  
+  - width - int, output signal width in bits  
+  - default - int, output signal default value  
+
+4. See examples/examples.py for examples
