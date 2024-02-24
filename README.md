@@ -51,7 +51,7 @@ Will cause:
     b. 2-bit-wide 'count' output to be inferred  
 
 ### 6. Condition comparing
-equivalent conditions, even if written in different manners, are merged into a single condition to simplfy graph presentation  
+Equivalent conditions, even if written in different manners, are merged into a single condition to simplfy graph presentation  
 
 For example, this condition:    
 ```python
@@ -61,6 +61,20 @@ Will be merged with the following condition:
 ```python
     'not ((cat = 1) or (dog = 0))'  
 ```
+
+### 7. RHS signals
+Names that appear in the right-hand-side of equations are treated as input and added to the module and graph.
+In addition, all previously described features work for this type of conditions as well.
+
+For example, this condition:    
+```python
+    'in_a = x and in_b = y'  
+```
+Will be merged with the following condition:  
+```python
+    'not ((in_a != x) or (in_b != y))'    
+```   
+And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 
 ## PLACEHOLDER 2
 
