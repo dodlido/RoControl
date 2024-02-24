@@ -16,7 +16,7 @@ def cond_2_g(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sig
         for s in sigs:
             if s.name == cond.name:
                 w = s.width
-        if w == 1: # Short version of writing is possible
+        if w == 1 and cond.value.isdigit(): # Short version of writing is possible
             if cond.value == '1':
                 return label + cond.name
             else:

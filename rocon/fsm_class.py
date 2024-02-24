@@ -62,9 +62,9 @@ class fsm:
         # 2. Buile module enum and current state sample:
         code += get_verilog_enum(self.clock, self.reset, self.default_state, self.states)
         # 3. Build module next-state logic:
-        code += get_verilog_ns_logic(self.inputs, self.states, self.arch_list)
+        code += get_verilog_ns_logic(self.inputs, [self.default_state] + self.states, self.arch_list)
         # 4. Build module output logic:
-        code += get_verilog_out_logic(self.outputs, self.states, self.arch_list)
+        code += get_verilog_out_logic(self.outputs, [self.default_state] + self.states, self.arch_list)
         # 5. Build module footer:
         code += get_verilog_footer()
         # 6. Write output .sv file:

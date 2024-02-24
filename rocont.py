@@ -1,6 +1,6 @@
 import argparse
 import sys
-from examples.examples import get_counter
+from examples.examples import cntr_exmp, cmp_exmp
 
 def flag_parser():
     # Instantiate the parser:
@@ -22,7 +22,7 @@ def flag_parser():
 def main():
     out_folder, graph, verilog = flag_parser()
     # Get FSM:
-    counter = get_counter()
+    counter = cmp_exmp()
     if (graph):
         # Generate graph:
         counter.build_graph(out_folder)

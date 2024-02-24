@@ -36,7 +36,7 @@ def cop_2_v(cop: str) -> str:
         return cop
     
 # Return bool which indicates if 'Condition' is met (param op val) i.e (3 == 4)
-def is_met_comp(param: int, op: str, val: int) -> bool:
+def is_met_comp(param: int | str, op: str, val: int | str) -> bool:
     if op=='=':
         return param==val
     elif op=='!=':

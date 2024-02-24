@@ -17,9 +17,12 @@ def cond_2_v(cond: type[Condition]|type[BoolAnd]|type[BoolNot]|type[BoolOr], sig
         for s in sigs:
             if s.name == cond.name:
                 w = s.width
-        return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:]
+        if cond.value.isdigit():
+            return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:]
+        else:
+            return code + cond.name + cop_2_v(cond.operator) + cond.value
     elif isinstance(cond, BoolNot): # Parse BoolNot
-        return code + lop_2_v(cond.logicop) + cond_2_v(cond.conditions[0], sigs, code)
+        return code + lop_2_v(cond.logicop) + '(' + cond_2_v(cond.conditions[0], sigs, code) + ')'
     else: # Parse BoolAnd and BoolOr
         lhs = '(' + cond_2_v(cond.conditions[0], sigs, code) + ')'
         rhs = '(' + cond_2_v(cond.conditions[1], sigs, code) + ')'
@@ -31,7 +34,10 @@ def out_2_v(cond: type[Condition]|type[BoolAnd], sigs: List[type[output]], code=
         for s in sigs:
             if s.name == cond.name:
                 w = s.width
-        return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:] + ';\n'
+        if cond.value.isdigit():
+            return code + cond.name + cop_2_v(cond.operator) + str(w) + '\'' + bin(int(cond.value))[1:] + ';\n'
+        else:
+            return code + cond.name + cop_2_v(cond.operator) + cond.value + ';\n'
     else: # Parse BoolAnd, no BoolOr or BoolNot are allowed in arch.out
         lhs = out_2_v(cond.conditions[0], sigs, code)
         rhs = out_2_v(cond.conditions[1], sigs, code)
@@ -56,21 +62,24 @@ def get_verilog_header() -> str:
     header +=     '//| Generated using RoControl python package |//\n'
     header +=     '                                                \n'
     header +=     'module ctrl #() (                               \n'
-    return header + '\n'
+    return header 
 
 def get_verilog_interface(clock: input, reset: input, inputs: List[input], outputs: List[output]) -> str:
-    interface = ''
+    interface =  '   // General //\n'
     interface += '   input wire [' + str(clock.width-1) + ':0] ' + clock.name + ',\n'
     interface += '   input wire [' + str(reset.width-1) + ':0] ' + reset.name + ',\n'
+    interface += '   // Inputs //\n'
     for i in range(len(inputs)):
         interface += '   input wire [' + str(inputs[i].width-1) + ':0] ' + inputs[i].name + ',\n'
+    interface += '   // Outputs //\n'
     for i in range(len(outputs)):
         interface += '   output reg [' + str(outputs[i].width-1) + ':0] ' + outputs[i].name + ',\n'
     interface = interface[:-2] + '\n);\n' # Remove final comma and add ); at the end
     return interface + '\n'
 
 def get_verilog_enum(clock: input, reset: input, default_state: state, states: List[state]) -> str:
-    enum = 'typedef enum {\n   ' + default_state.name + ',\n'
+    enum = '// States enum declaration //\n'
+    enum += 'typedef enum {\n   ' + default_state.name + ',\n'
     for i in range(len(states)):
         enum += '   ' + states[i].name + ',\n'
     enum += '} State ;\n'
@@ -84,7 +93,8 @@ def get_verilog_enum(clock: input, reset: input, default_state: state, states: L
     return enum + '\n'
 
 def get_verilog_ns_logic(inputs: List[input], states: List[state], archs: List[arch]) -> str:
-    ns_logic  = 'always_comb begin\n'
+    ns_logic =  '// Next state logic //\n'
+    ns_logic += 'always_comb begin\n'
     ns_logic += '   case(current_state)\n'
     for s in states:
         a_list = []
@@ -109,7 +119,8 @@ def get_verilog_ns_logic(inputs: List[input], states: List[state], archs: List[a
     return ns_logic + '\n'
 
 def get_verilog_out_logic(outputs: List[output], states: List[state], archs: List[arch]) -> str:
-    out_logic  = 'always_comb begin\n'
+    out_logic   = '// Output logic //\n'
+    out_logic  += 'always_comb begin\n'
     for o in outputs:
         out_logic += '   ' + o.name + ' = ' + str(o.width) + '\'' + bin(o.default)[1:] + ' ;\n'
     out_logic += '   case(current_state)\n'
@@ -127,5 +138,5 @@ def get_verilog_out_logic(outputs: List[output], states: List[state], archs: Lis
     
 def get_verilog_footer() -> str:
     footer  = 'endmodule:ctrl\n\n'
-    footer += '//| Enjoy! Esty                                  |//\n'
+    footer += '//| Enjoy!                                       |//\n'
     return footer
