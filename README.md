@@ -50,7 +50,7 @@ interface does not have to be declared but is inferred from the archs definition
 
 For example, defining this arch:  
 ```python
-    arch = arch('IDLE', 'S1', 'valid = 1 and clear = 0', 'count = 3')  
+arch = arch('IDLE', 'S1', 'valid = 1 and clear = 0', 'count = 3')  
 ```
 Will cause:  
     a. 1-bit-wide 'valid' and 'clear' inputs to be inferred  
@@ -61,11 +61,11 @@ Equivalent conditions, even if written in different manners, are merged into a s
 
 For example, this condition:    
 ```python
-    'cat = 0 and dog = 1'  
+'cat = 0 and dog = 1'  
 ```
 Will be merged with the following condition:  
 ```python
-    'not ((cat = 1) or (dog = 0))'  
+'not ((cat = 1) or (dog = 0))'  
 ```
 
 ### 7. RHS signals
@@ -74,11 +74,11 @@ In addition, all previously described features work for this type of conditions 
 
 For example, this condition:    
 ```python
-    'in_a = x and in_b = y'  
+'in_a = x and in_b = y'  
 ```
 Will be merged with the following condition:  
 ```python
-    'not ((in_a != x) or (in_b != y))'    
+'not ((in_a != x) or (in_b != y))'    
 ```   
 And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 
@@ -88,7 +88,7 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 
 2. The class constructor is shown here:  
 ```python
-    def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=None) -> None:  
+def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=None) -> None:  
 ```
 - 'arch_list' is a list of instances of a class named 'arch'. 
   - 'source' and 'dest' are the source and destination states of the arch. For basic usage stick with sending strings containg desired state name.  
@@ -96,7 +96,7 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
   - 'out_str' describes the desired outputs for the transition, examples can be seen in the above feature description.  
   - The 'arch' class constructor is shown here:  
   ```python
-       def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
+  def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
   ```
 - 'default_state' - optional, name of default state, if none is specified use first source state in first arch_list in fsm  
 - 'clock' - optional, name of clock signal, if none is specified use 'clk'  
