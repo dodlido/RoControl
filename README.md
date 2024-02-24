@@ -100,9 +100,12 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 - input_list - a List of 'input' base class instances, each containing:  
   - name - string, input signal name  
   - width - int, input signal width in bits  
-- input_list - a List of 'input' base class instances, each containing:  
+- output_list - a List of 'input' base class instances, each containing:  
   - name - string, output signal name  
   - width - int, output signal width in bits  
   - default - int, output signal default value  
+- states - a List of 'state' base class instances, each containing:  
+  - name - string, state name  
+  - default - bool, True if this state is a default state
 
 4. See examples/examples.py for examples
