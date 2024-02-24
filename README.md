@@ -22,12 +22,12 @@ a6 = arch('S1'  , 'IDLE', 'clear = 1                          ', 'count = 0     
 ### 2. Graph
 state machine graph which depicts the state transitions conditions and outputs which is derived from the high level description
 
-![Graph Example](resources\exmp_graph.JPG)
+![Graph Example](resources/exmp_verilog.jpg)
 
 ### 3. Verilog
 .v file containing synthesizable verilog code which is derived from the high level description  
 
-![Code Example](resources/exmp_verilog.JPG)
+![Code Example](resources/exmp_verilog.jpg)
  
 ### 4. Parsing 
 support for multiple conditions in a single line, handles white spaces and brackets:
