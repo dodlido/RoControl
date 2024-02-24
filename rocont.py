@@ -22,7 +22,7 @@ def flag_parser():
 def main():
     out_folder, graph, verilog = flag_parser()
     # Get FSM:
-    counter = cmp_exmp()
+    counter = cntr_exmp()
     if (graph):
         # Generate graph:
         counter.build_graph(out_folder)
