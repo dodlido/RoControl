@@ -30,7 +30,7 @@ class state:
 
 # Arch class:
 class arch:
-    def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str, index=0) -> None:
+    def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
         if isinstance(source, str):
             self.source = state(source, False)
         else:
@@ -39,6 +39,6 @@ class arch:
             self.dest = state(dest, False)
         else:
             self.dest = dest
-        self.index = index
+        self.index = 0
         self.cond = parse(cond_str)
         self.out = parse(out_str)
