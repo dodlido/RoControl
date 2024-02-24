@@ -8,13 +8,15 @@ A python tool to generate state machines graphs and verilog code using high leve
 ### 1. High-level description
 Only archs are required for a full description of a state machine. For example, this is a valid description:  
 ```python
-    a0 = arch('IDLE', 'S1'  , 'valid = 1 and clear = 0            ', 'count = 1             ')
-    a1 = arch('S1'  , 'S2'  , '(not valid = 0) and clear = 0      ', 'count = 2             ')
-    a2 = arch('S2'  , 'S3'  , 'valid = 1 and (not clear = 1)      ', 'count = 3 and done = 1')
-    a3 = arch('S3'  , 'S1'  , '(not valid = 0) and (not clear = 1)', 'count = 1             ')
-    a4 = arch('S3'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
-    a5 = arch('S2'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
-    a6 = arch('S1'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
+# Define the arch: IDLE state --> S1 state if (valid and !clear), output is count=1:
+a0 = arch('IDLE', 'S1'  , 'valid = 1 and clear = 0            ', 'count = 1             ')
+# Rest of the archs follow the same convention:
+a1 = arch('S1'  , 'S2'  , '(not valid = 0) and clear = 0      ', 'count = 2             ')
+a2 = arch('S2'  , 'S3'  , 'valid = 1 and (not clear = 1)      ', 'count = 3 and done = 1')
+a3 = arch('S3'  , 'S1'  , '(not valid = 0) and (not clear = 1)', 'count = 1             ')
+a4 = arch('S3'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
+a5 = arch('S2'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
+a6 = arch('S1'  , 'IDLE', 'clear = 1                          ', 'count = 0             ')
 ```
 
 ### 2. Graph
@@ -32,11 +34,15 @@ support for multiple conditions in a single line, handles white spaces and brack
 
 This is fine: 
 ```python 
-    'cat !=   1  '
+'cat !=   1  '
 ```
 And this is also fine:  
 ```python
-    'not(cat=1)'
+'not(cat=1)'
+```
+Finally, this is fine (albeit, meaningless):
+```python
+'cat!=1 and not(cat!=1)'
 ```
 
 ### 5. Interface inferring
