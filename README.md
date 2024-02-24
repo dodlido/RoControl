@@ -84,13 +84,14 @@ And both 'x' and 'y' will be treated as inputs in addition to 'in_a' and 'in_b'
 ```python
     def __init__(self, arch_list: List[arch], default_state=None, clock=None, reset=None) -> None:  
 ```
-- 'arch_list' is a list of instances of a class named 'arch'. The 'arch' class constructor is shown here:  
-```python
-       def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
-```
+- 'arch_list' is a list of instances of a class named 'arch'. 
   - 'source' and 'dest' are the source and destination states of the arch. For basic usage stick with sending strings containg desired state name.  
   - 'cond_str' is the condition which trigers the transition between source and dest, examples can be seen in the above feature description.  
   - 'out_str' describes the desired outputs for the transition, examples can be seen in the above feature description.  
+  - The 'arch' class constructor is shown here:  
+  ```python
+       def __init__ (self, source: type[state]|str, dest: type[state]|str, cond_str: str, out_str: str) -> None:
+  ```
 - 'default_state' - optional, name of default state, if none is specified use first source state in first arch_list in fsm  
 - 'clock' - optional, name of clock signal, if none is specified use 'clk'  
 - 'reset' - optional, name of reset signal, if none is specified use 'rst_n'  
