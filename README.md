@@ -26,6 +26,7 @@ state machine graph which depicts the state transitions conditions and outputs w
 ### 3. Verilog
 .v file containing synthesizable verilog code which is derived from the high level description  
     
+    <span style="font-size:0.5em;">
     '''
     //| Name: ctrl.sv                            |//
     //| Date: 2024-02-24                         |//
@@ -130,6 +131,7 @@ state machine graph which depicts the state transitions conditions and outputs w
 
     //| Enjoy!                                       |//
     '''
+    </span>
 
 ### 4. Parsing 
 support for multiple conditions in a single line, handles white spaces and brackets:
