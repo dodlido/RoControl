@@ -26,7 +26,6 @@ state machine graph which depicts the state transitions conditions and outputs w
 ### 3. Verilog
 .v file containing synthesizable verilog code which is derived from the high level description  
     
-    <span style="font-size:0.5em;">
     '''
     //| Name: ctrl.sv                            |//
     //| Date: 2024-02-24                         |//
@@ -130,43 +129,31 @@ state machine graph which depicts the state transitions conditions and outputs w
     endmodule:ctrl
 
     //| Enjoy!                                       |//
-    '''
-    </span>
 
 ### 4. Parsing 
 support for multiple conditions in a single line, handles white spaces and brackets:
 
 This is fine:  
-    '''
     cat !=   1  
-    '''
 And this is also fine:  
-    '''
     not (cat=1)  
-    '''
 
 ### 5. Interface inferring
 interface does not have to be declared but is inferred from the archs definitions including name and required width in bits
 
-For example, defining this arch:
-    '''
-    arch = arch('IDLE', 'S1', 'valid = 1 and clear = 0', 'count = 3')
-    '''
+For example, defining this arch:  
+    arch = arch('IDLE', 'S1', 'valid = 1 and clear = 0', 'count = 3')  
 Will cause:  
     a. 1-bit-wide 'valid' and 'clear' inputs to be inferred  
     b. 2-bit-wide 'count' output to be inferred  
 
 ### 6. Condition comparing
-equivalent conditions, even if written in different manners, are merged into a single condition to simplfy graph presentation
+equivalent conditions, even if written in different manners, are merged into a single condition to simplfy graph presentation  
 
-For example, this condition:  
-    '''
-    cat = 0 and dog = 1
-    '''
+For example, this condition:    
+    cat = 0 and dog = 1  
 Will be merged with the following condition:  
-    '''
     not ((cat = 1) or (dog = 0))  
-    '''
 
 ## PLACEHOLDER 2
 
